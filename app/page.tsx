@@ -1,101 +1,119 @@
+"use client";
+
+import { Card } from "@/components/ui/card";
 import Image from "next/image";
+import { useState, useEffect } from "react";
+import { fetchEvents, type Event } from "@/lib/api";
+import Loader from "@/components/ui/loader";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
-export default function Home() {
+export default function EventApp() {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    fetchEvents()
+      .then((data) => {
+        setEvents(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching events:", error);
+        setLoading(false);
+      });
+  }, []);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <>
+      {/* Top 10 Section */}
+      <section className="mb-6">
+        <h2 className="px-4 text-xl font-semibold mb-3">Топ 10 в Москве</h2>
+        {loading ? (
+          <Loader />
+        ) : (
+          <div className="flex overflow-x-auto gap-3 px-4 pb-2 hide-scrollbar">
+            {events.slice(0, 10).map((item) => (
+              <Link href={`/event/${item.id}`} key={item.id}>
+                <Card className="flex-none w-[80vw] max-w-[256px] h-32 bg-black text-white rounded-xl">
+                  <Image
+                    src={item.image ?? "/placeholder.svg"}
+                    alt={item.title}
+                    width={256}
+                    height={128}
+                    className="w-full h-full object-cover rounded-xl opacity-80"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = "/placeholder.svg";
+                    }}
+                  />
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      {/* For You Section */}
+      <section className="mb-6 relative">
+        <h2 className="px-4 text-xl font-semibold mb-3">Сегодня здесь</h2>
+
+        {loading ? (
+          <Loader />
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-3 px-4 filter blur-sm">
+              {events.slice(5, 9).map((item) => (
+                <Link href={`/event/${item.id}`} key={item.id}>
+                  <Card className="aspect-square bg-black text-white rounded-xl overflow-hidden">
+                    <Image
+                      src={item.image ?? "/placeholder.svg"}
+                      alt={item.title}
+                      width={200}
+                      height={200}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "/placeholder.svg";
+                      }}
+                    />
+                  </Card>
+                </Link>
+              ))}
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Button
+                variant="secondary"
+                className="z-10"
+                onClick={() => {
+                  window.location.href = "https://t.me/EventumHrnyGrglBot";
+                }}
+              >
+                Купить подписку
+              </Button>
+            </div>
+          </>
+        )}
+      </section>
+
+      {/* Contacts Section */}
+      <section className="mb-6">
+        <h2 className="px-4 text-xl font-semibold mb-3">Контакты</h2>
+        <div className="px-4">
+          <p>
+            Email:{" "}
+            <a href="mailto:co.eventum@yandex.ru" className="text-blue-500">
+              co.eventum@yandex.ru
+            </a>
+          </p>
+          <p>
+            Telegram:{" "}
+            <a href="https://t.me/EventumHrnyGrglBot" className="text-blue-500">
+              @EventumHrnyGrglBot
+            </a>
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </section>
+    </>
   );
 }

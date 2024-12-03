@@ -1,4 +1,13 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {};
+import withPWA from 'next-pwa';
 
-export default nextConfig;
+const config = withPWA({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+})({
+  images: {
+    domains: ['media.kudago.com'],
+  },
+});
+
+export default config;
