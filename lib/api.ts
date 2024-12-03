@@ -14,6 +14,7 @@ interface EventApi {
   };
   price: string;
   categories: string[];
+  site_url: string;
 }
 
 export type Event = {
@@ -30,6 +31,7 @@ export type Event = {
   image?: string;
   price?: string;
   category?: string;
+  url?: string;
 };
 
 export async function fetchEvents(): Promise<Event[]> {
@@ -47,6 +49,7 @@ export async function fetchEvents(): Promise<Event[]> {
       image: event?.images[0]?.image,
       price: event?.price,
       category: event?.categories[0],
+      url: event?.site_url,
     }));
 }
 
@@ -54,18 +57,19 @@ export async function fetchEventById(id: string): Promise<Event | null> {
   const response = await fetch(`/api/event?id=${id}`);
   const data = await response.json();
 
-  if (!data.results.length) {
+  if (data.results.length === 0) {
     return null;
   }
 
   return {
-    id: data.results[0].id,
-    title: data.results[0].title,
-    description: data.results[0].description,
-    place: data.results[0].place,
-    image: data.results[0].images[0]?.image,
-    price: data.results[0].price,
-    category: data.results[0].categories[0],
+    id: data.results[0]?.id,
+    title: data.results[0]?.title,
+    description: data.results[0]?.description,
+    place: data.results[0]?.place,
+    image: data.results[0]?.images?.[0]?.image,
+    price: data.results[0]?.price,
+    category: data.results[0]?.categories?.[0],
+    url: data.results[0]?.site_url,
   };
 }
 
