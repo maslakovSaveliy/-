@@ -42,9 +42,9 @@ export default function RootLayout({
         <link rel="icon" href="/icons/e.ico" type="image/x-icon" />
         <title>EVENTUM</title>
       </head>
-      <body className={montserrat.className}>
-        <div className="max-w-md mx-auto min-h-screen w-full bg-gradient-to-br from-pink-200 via-pink-300 to-pink-200">
-          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white opacity-20 pointer-events-none"></div>
+      <body className={`${montserrat.className} bg-gradient-to-br from-pink-200 via-pink-300 to-pink-200`}>
+        <div className="max-w-full mx-auto min-h-screen w-full">
+          <div className="absolute inset-0  pointer-events-none"></div>
           {/* Header */}
           <header className="sticky top-0 bg-white/80 backdrop-blur-sm z-10">
             <div className="px-4 py-3 flex items-center justify-between">
