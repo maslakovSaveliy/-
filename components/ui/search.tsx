@@ -37,7 +37,6 @@ export function Search() {
       debouncedSearch(searchTerm);
     } else {
       setShowResults(false);
-      setShowSuggestions(true);
     }
   }, [searchTerm, debouncedSearch]);
 
