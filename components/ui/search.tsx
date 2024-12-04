@@ -14,6 +14,7 @@ export function Search() {
   const [results, setResults] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
   const debouncedSearch = useDebouncedCallback((value) => {
@@ -32,9 +33,11 @@ export function Search() {
   useEffect(() => {
     if (searchTerm) {
       setShowResults(true);
+      setShowSuggestions(false);
       debouncedSearch(searchTerm);
     } else {
       setShowResults(false);
+      setShowSuggestions(true);
     }
   }, [searchTerm, debouncedSearch]);
 
@@ -45,6 +48,7 @@ export function Search() {
         !searchRef.current.contains(event.target as Node)
       ) {
         setShowResults(false);
+        setShowSuggestions(false);
       }
     };
 
@@ -57,6 +61,13 @@ export function Search() {
     setSearchTerm("");
   };
 
+  const searchSuggestions = [
+    { label: "Вечеринка", color: "#e58cfc" },
+    { label: "Праздники", color: "#d9ff0090" },
+    { label: "Концерт", color: "#00ff0090" },
+    { label: "Stand Up", color: "#ff000076" },
+  ];
+
   return (
     <div className="relative" ref={searchRef}>
       <div className="relative">
@@ -67,33 +78,52 @@ export function Search() {
           className="w-full bg-white/80 text-gray-800 placeholder-gray-500 rounded-lg pl-10 pr-4 py-2 outline-none focus:ring-2 focus:ring-blue-400 shadow-sm"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          onFocus={() => setShowSuggestions(true)}
         />
       </div>
-      {showResults && (
+      {(showResults || showSuggestions) && (
         <Card className="absolute z-10 w-full mt-1 max-h-60 overflow-auto">
-          {isLoading ? (
-            <div className="p-4">
-              <Loader />
-            </div>
-          ) : results.length > 0 ? (
-            <ul className="divide-y divide-gray-200">
-              {results.map((event) => (
-                <li key={event.id} className="p-4 hover:bg-gray-50">
-                  <Link
-                    href={`/event/${event.id}`}
-                    className="block"
-                    onClick={handleEventClick}
-                  >
-                    <h3 className="text-lg font-semibold">{event.title}</h3>
-                    {event.price && (
-                      <p className="text-sm text-gray-600">{event.price}</p>
-                    )}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          {showResults ? (
+            isLoading ? (
+              <div className="p-4">
+                <Loader />
+              </div>
+            ) : results.length > 0 ? (
+              <ul className="divide-y divide-gray-200">
+                {results.map((event) => (
+                  <li key={event.id} className="p-4 hover:bg-gray-50">
+                    <Link
+                      href={`/event/${event.id}`}
+                      className="block"
+                      onClick={handleEventClick}
+                    >
+                      <h3 className="text-lg font-semibold">{event.title}</h3>
+                      {event.price && (
+                        <p className="text-sm text-gray-600">{event.price}</p>
+                      )}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="p-4 text-center text-gray-500">Ничего не найдено</p>
+            )
           ) : (
-            <p className="p-4 text-center text-gray-500">Ничего не найдено</p>
+            <div className="p-4 space-y-2">
+              {searchSuggestions.map((suggestion) => (
+                <button
+                  key={suggestion.label}
+                  className="flex items-center space-x-2 p-2 bg-white rounded-lg shadow-sm hover:bg-gray-100 w-full"
+                  onClick={() => setSearchTerm(suggestion.label)}
+                >
+                  <span
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: suggestion.color }}
+                  ></span>
+                  <span>{suggestion.label}</span>
+                </button>
+              ))}
+            </div>
           )}
         </Card>
       )}

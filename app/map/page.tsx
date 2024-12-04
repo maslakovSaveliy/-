@@ -15,6 +15,7 @@ import { WeekdayCalendar } from "@/components/ui/weekday-calendar";
 const categoryColors: Record<string, string> = {
 	party: "#ff000076",
 	concert: "#00ff0090",
+	holiday: "#d9ff0090",
 	default: "#e58cfc"
 };
 
